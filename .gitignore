@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+*.tsbuildinfo
+
+# Environment variables (※ posted_urls.json は Git 管理対象なので除外しない)
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Editor / OS
+.DS_Store
+.vscode/
+.idea/
+*.swp
+
+# Test coverage
+coverage/

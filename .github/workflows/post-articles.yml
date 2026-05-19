@@ -1,0 +1,73 @@
+name: Post security news to Bluesky
+
+on:
+  # JST 9:05 〜 23:05 の毎時 1 回実行 = UTC 00:05 〜 14:05
+  schedule:
+    - cron: "5 0-14 * * *"
+  workflow_dispatch:
+    inputs:
+      max_posts:
+        description: "1 回の最大投稿件数"
+        required: false
+        default: "1"
+      disable_filter:
+        description: "キーワードフィルタを無効化 (true)"
+        required: false
+        default: ""
+      debug:
+        description: "デバッグログ (true)"
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+
+concurrency:
+  group: post-articles
+  cancel-in-progress: false
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          persist-credentials: true
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Run bot
+        env:
+          BLUESKY_HANDLE: ${{ secrets.BLUESKY_HANDLE }}
+          BLUESKY_APP_PASSWORD: ${{ secrets.BLUESKY_APP_PASSWORD }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          MAX_POSTS_PER_RUN: ${{ github.event.inputs.max_posts || '1' }}
+          DISABLE_KEYWORD_FILTER: ${{ github.event.inputs.disable_filter }}
+          DEBUG: ${{ github.event.inputs.debug }}
+        run: npm start
+
+      - name: Commit posted_urls.json if changed
+        run: |
+          if [[ -n "$(git status --porcelain data/posted_urls.json)" ]]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add data/posted_urls.json
+            git commit -m "chore(bot): update posted_urls.json [skip ci]"
+            git push
+          else
+            echo "No changes to posted_urls.json"
+          fi

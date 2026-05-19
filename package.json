@@ -1,0 +1,31 @@
+{
+  "name": "sec-news-bot",
+  "version": "0.1.0",
+  "private": true,
+  "description": "セキュリティニュース (脆弱性 / ランサムウェア / 漏洩 / サプライチェーン攻撃 等) を複数 RSS から集めて Bluesky に投稿する Bot。英語記事は Claude で日本語訳。",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts",
+    "setup:profile": "tsx scripts/updateProfile.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "@atproto/api": "^0.13.18",
+    "axios": "^1.7.7",
+    "rss-parser": "^3.13.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.10",
+    "tsx": "^4.19.0",
+    "typescript": "^5.5.3",
+    "vitest": "^2.0.0"
+  }
+}

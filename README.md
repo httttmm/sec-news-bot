@@ -1,6 +1,8 @@
 # sec-news-bot
 
-セキュリティニュース（**脆弱性 / ランサムウェア / 漏洩 / サプライチェーン攻撃** など）を国内外の RSS から集め、英語記事は Claude (Anthropic) で **日本語に翻訳** して Bluesky に投稿する Bot です。
+[![Post security news to Bluesky](https://github.com/httttmm/sec-news-bot/actions/workflows/post-articles.yml/badge.svg)](https://github.com/httttmm/sec-news-bot/actions/workflows/post-articles.yml)
+
+セキュリティ関連ニュースを国内外の RSS から集め、英語記事は Claude (Anthropic) で **日本語に翻訳** して Bluesky に投稿する Bot です。
 
 GitHub Actions の cron で JST 9〜23 時の毎時 1 件ずつ投稿します。
 

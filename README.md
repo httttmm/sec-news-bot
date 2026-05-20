@@ -14,12 +14,16 @@ GitHub Actions の cron で JST 9〜23 時の毎時 1 件ずつ投稿します�
 [日本語タイトル]
 
 [2〜3 文の日本語要約 (100〜170 字)]
+
+[#ハッシュタグ1 #ハッシュタグ2 #ハッシュタグ3]
 ```
 
 リンクカード部分:
 - 元記事の URL
 - 日本語訳されたタイトルと説明
 - 元記事の OGP 画像 (1MB 以内)
+
+ハッシュタグは記事内容に応じて自動選定（最大 3 つ）。`src/modules/hashtagger.ts` の `HASHTAG_RULES` を編集してカスタマイズ可能。
 
 ---
 
@@ -46,6 +50,7 @@ sec-news-bot/
 │       ├── dotenv.ts             # .env 読込
 │       ├── rssFetcher.ts         # 複数 RSS を並列取得・マージ
 │       ├── keywordFilter.ts      # セキュリティキーワード ホワイトリスト
+│       ├── hashtagger.ts         # 記事内容に応じたハッシュタグ自動選定 (最大 3)
 │       ├── languageDetect.ts     # CJK 比率による簡易言語判定
 │       ├── translator.ts         # 言語別の翻訳/要約 (Claude Haiku)
 │       ├── postedUrlsStore.ts    # 投稿済み URL の永続化

@@ -7,6 +7,7 @@ import { createOgpFetcher } from './modules/ogpFetcher.js';
 import { createBlueskyPoster } from './modules/blueskyPoster.js';
 import { createTranslator } from './modules/translator.js';
 import { filterBySecurityTopic } from './modules/keywordFilter.js';
+import { pickHashtags } from './modules/hashtagger.js';
 import type { RunSummary, SecArticle, TranslatedContent } from './types/index.js';
 
 loadDotenvIfPresent();
@@ -171,16 +172,31 @@ async function main(): Promise<void> {
           });
       }
 
-      // d. 投稿
-      const result = await poster.postArticle({ article, translated, image });
+      // d. ハッシュタグ判定 (記事の英語原文 + 翻訳テキストの両方から拾う)
+      const hashtagSource = [
+        article.title,
+        article.contentSnippet ?? '',
+        translated.title,
+        translated.description,
+      ].join(' ');
+      const hashtags = pickHashtags(hashtagSource);
 
-      // e. 投稿済みとして記録
+      // e. 投稿
+      const result = await poster.postArticle({
+        article,
+        translated,
+        image,
+        hashtags,
+      });
+
+      // f. 投稿済みとして記録
       store.markAsPosted(article.url);
       summary.posted++;
       logger.info('post_success', {
         url: article.url,
         withImage: result.withImage,
         ja_title: translated.title,
+        hashtags,
       });
     } catch (err) {
       summary.failed++;

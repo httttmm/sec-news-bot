@@ -8,6 +8,7 @@ const DEFAULT_FEED_URLS = [
 const DEFAULT_TRANSLATION_MODEL = 'claude-haiku-4-5-20251001';
 const DEFAULT_MAX_POSTS_PER_RUN = 1;
 const DEFAULT_POSTED_URLS_FILE = 'data/posted_urls.json';
+const DEFAULT_MAX_STORED_URLS = 1000;
 const DEFAULT_POST_INTERVAL_MS = 3000;
 
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
@@ -29,6 +30,12 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
   const postedUrlsFile =
     env.POSTED_URLS_FILE?.trim() || DEFAULT_POSTED_URLS_FILE;
 
+  const maxStoredUrls = parsePositiveInt(
+    env.MAX_STORED_URLS,
+    DEFAULT_MAX_STORED_URLS,
+    'MAX_STORED_URLS'
+  );
+
   const postIntervalMs = parsePositiveInt(
     env.POST_INTERVAL_MS,
     DEFAULT_POST_INTERVAL_MS,
@@ -47,6 +54,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     feedSources,
     maxPostsPerRun,
     postedUrlsFile,
+    maxStoredUrls,
     postIntervalMs,
     disableKeywordFilter,
     debug,

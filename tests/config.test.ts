@@ -43,6 +43,25 @@ describe('loadConfig', () => {
     const c = loadConfig({ ...VALID, DISABLE_KEYWORD_FILTER: 'true' });
     expect(c.disableKeywordFilter).toBe(true);
   });
+
+  it('MAX_STORED_URLS のデフォルトは 1000', () => {
+    const c = loadConfig({ ...VALID });
+    expect(c.maxStoredUrls).toBe(1000);
+  });
+
+  it('MAX_STORED_URLS を上書きできる', () => {
+    const c = loadConfig({ ...VALID, MAX_STORED_URLS: '500' });
+    expect(c.maxStoredUrls).toBe(500);
+  });
+
+  it('MAX_STORED_URLS が不正なら例外', () => {
+    expect(() =>
+      loadConfig({ ...VALID, MAX_STORED_URLS: 'abc' })
+    ).toThrowError(/MAX_STORED_URLS/);
+    expect(() =>
+      loadConfig({ ...VALID, MAX_STORED_URLS: '0' })
+    ).toThrowError(/MAX_STORED_URLS/);
+  });
 });
 
 describe('parseFeedUrls', () => {

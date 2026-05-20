@@ -25,6 +25,8 @@ export interface Config {
   feedSources: FeedSource[];
   maxPostsPerRun: number;
   postedUrlsFile: string;
+  /** 投稿済み URL の保持上限件数。これを超えると古いものから削除される */
+  maxStoredUrls: number;
   postIntervalMs: number;
   /** キーワードフィルタを無効化するか */
   disableKeywordFilter: boolean;

@@ -89,6 +89,7 @@ npm run dev              # 動作確認 (実投稿あり・Claude API 課金あ�
 | `MAX_POSTS_PER_RUN` | — | `1` | 1 実行あたり最大投稿件数 |
 | `DISABLE_KEYWORD_FILTER` | — | `false` | `true` でキーワードフィルタを無効化 |
 | `POSTED_URLS_FILE` | — | `data/posted_urls.json` | 投稿済み URL 保存先 |
+| `MAX_STORED_URLS` | — | `1000` | 投稿済み URL の保持上限 (超えると古いものからバッチ削除) |
 | `POST_INTERVAL_MS` | — | `3000` | 投稿間隔 (ms) |
 | `BOT_DESCRIPTION` | — | (出典明示文) | `npm run setup:profile` で bio に設定 |
 | `DEBUG` | — | — | `true` でデバッグログ |
@@ -131,4 +132,4 @@ npm run typecheck
 - **言語判定**: CJK 文字の比率が 15% 以上で日本語と判定
 - **翻訳失敗時**: 英語/原文タイトルで投稿 (記事自体は飛ばさない)
 - **SSRF 対策**: og:image 経由でプライベート IP へ飛ばない
-- **`posted_urls.json` は最大 1000 件保持**
+- **`posted_urls.json` の上限**: デフォルト 1000 件 (`MAX_STORED_URLS` で変更可)。超過時はバッチで 10% 削減 (例: 1000 → 900 件)

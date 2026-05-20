@@ -1,13 +1,25 @@
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 
-const MAX_STORED_URLS = 1000;
+/** デフォルトの保持上限件数 */
+export const DEFAULT_MAX_STORED_URLS = 1000;
+/** 上限到達時のバッチ削減率 (デフォルト 10%)。
+ *  max=1000, ratio=0.1 → 1001 件になったら 900 件まで一気に削減 */
+const TRIM_RATIO = 0.1;
 
 interface StoreFileFormat {
   /** スキーマバージョン (将来の移行に備える) */
   version: 1;
   /** 投稿済み URL を新しい順に保持する */
   urls: string[];
+}
+
+export interface LoadPostedUrlsOptions {
+  /**
+   * 保持する最大件数。これを超えると古いものから削除される。
+   * デフォルト 1000。
+   */
+  maxStoredUrls?: number;
 }
 
 export interface PostedUrlsStore {
@@ -25,15 +37,32 @@ export interface PostedUrlsStore {
  * 指定パスから投稿済み URL のストアを読み込む。
  * - ファイルが存在しない場合は空のストアを返す
  * - 古いバージョン (配列のみ) のフォーマットも読み込み可能
+ * - `maxStoredUrls` を指定すると、その件数を上限として古いものから削除する
+ *   (バッチ削減方式: 上限到達時に 10% 分を一気にトリム)
  */
-export async function loadPostedUrls(filePath: string): Promise<PostedUrlsStore> {
+export async function loadPostedUrls(
+  filePath: string,
+  options: LoadPostedUrlsOptions = {}
+): Promise<PostedUrlsStore> {
+  const max = normalizeMax(options.maxStoredUrls);
   const urls = await readUrlsFile(filePath);
-  return createStore(filePath, urls);
+  return createStore(filePath, urls, max);
 }
 
-function createStore(filePath: string, initialUrls: string[]): PostedUrlsStore {
+function createStore(
+  filePath: string,
+  initialUrls: string[],
+  max: number
+): PostedUrlsStore {
+  // 上限を超えた時に削減する目標サイズ (max の 90%)
+  const trimTarget = Math.max(1, Math.floor(max * (1 - TRIM_RATIO)));
+
   // 内部表現は "新しい順" の配列 + 高速検索用 Set
-  const urls: string[] = [...initialUrls];
+  // 読み込み時点で上限を超えていれば即トリム (既存ファイルの肥大化対策)
+  let urls: string[] = [...initialUrls];
+  if (urls.length > max) {
+    urls = urls.slice(0, trimTarget);
+  }
   const set = new Set<string>(urls);
 
   return {
@@ -45,12 +74,10 @@ function createStore(filePath: string, initialUrls: string[]): PostedUrlsStore {
       // 新しいものを先頭に挿入
       urls.unshift(url);
       set.add(url);
-      // 上限を超えたら古いものから削除
-      while (urls.length > MAX_STORED_URLS) {
-        const removed = urls.pop();
-        if (removed !== undefined) {
-          set.delete(removed);
-        }
+      // 上限を超えたら trimTarget までバッチ削減
+      if (urls.length > max) {
+        const removed = urls.splice(trimTarget);
+        for (const r of removed) set.delete(r);
       }
     },
     size(): number {
@@ -63,6 +90,12 @@ function createStore(filePath: string, initialUrls: string[]): PostedUrlsStore {
       await fs.writeFile(filePath, json, 'utf-8');
     },
   };
+}
+
+function normalizeMax(raw: number | undefined): number {
+  if (raw === undefined) return DEFAULT_MAX_STORED_URLS;
+  if (!Number.isFinite(raw) || raw < 1) return DEFAULT_MAX_STORED_URLS;
+  return Math.floor(raw);
 }
 
 async function readUrlsFile(filePath: string): Promise<string[]> {
@@ -119,4 +152,4 @@ function isFileNotFound(err: unknown): boolean {
   );
 }
 
-export const __testing = { MAX_STORED_URLS };
+export const __testing = { DEFAULT_MAX_STORED_URLS, TRIM_RATIO };

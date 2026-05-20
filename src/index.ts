@@ -25,8 +25,13 @@ async function main(): Promise<void> {
   });
 
   // 1. 投稿済み URL の読み込み
-  const store = await loadPostedUrls(config.postedUrlsFile);
-  logger.debug('posted_urls_loaded', { size: store.size() });
+  const store = await loadPostedUrls(config.postedUrlsFile, {
+    maxStoredUrls: config.maxStoredUrls,
+  });
+  logger.debug('posted_urls_loaded', {
+    size: store.size(),
+    maxStoredUrls: config.maxStoredUrls,
+  });
 
   // 2. 全ソースから RSS 取得
   const rss = createRssFetcher();

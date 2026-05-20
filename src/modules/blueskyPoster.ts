@@ -20,6 +20,8 @@ export interface PostArticleArgs {
   article: SecArticle;
   translated: TranslatedContent;
   image?: { buffer: Buffer; mimeType: string };
+  /** 投稿本文末尾に付与するハッシュタグ (例: ["#セキュリティ", "#ランサムウェア"]) */
+  hashtags?: string[];
 }
 
 export interface BlueskyPoster {
@@ -42,11 +44,12 @@ export function createBlueskyPoster(
       });
     },
 
-    async postArticle({ article, translated, image }) {
-      // 投稿本文: タイトル + 要約 (sec-news-bot は HN リンクのような trailer 無し)
+    async postArticle({ article, translated, image, hashtags = [] }) {
+      // 投稿本文: タイトル + 要約 + ハッシュタグ (3 段構成、tags が空なら 2 段)
       const text = buildPostText({
         title: translated.title,
         description: translated.description,
+        hashtags,
         fallbackTitle: article.title,
       });
 
@@ -98,6 +101,8 @@ export function createBlueskyPoster(
 export interface PostTextArgs {
   title: string;
   description: string;
+  /** 投稿末尾に付ける `#xxx` 形式のハッシュタグ配列。空なら省略される */
+  hashtags?: string[];
   fallbackTitle: string;
 }
 
@@ -107,31 +112,49 @@ const MAX_TITLE_GRAPHEMES = 90;
 /**
  * Bluesky 投稿本文を組み立てる。
  *
- * フォーマット:
+ * フォーマット (description / hashtags の有無で 1〜3 段):
  *   <タイトル>
  *
- *   <要約>     ← description があるときだけ
+ *   <要約>           ← description があるとき
  *
- * sec-news-bot は HN bot のような末尾リンクが無いので、
- * タイトル + 要約のみのシンプル構成。
+ *   <#tag1 #tag2 …>  ← hashtags があるとき
+ *
+ * 全体で 300 グラフェムを超えないよう、ハッシュタグの予算を先に確保し、
+ * 残りでタイトルと要約を配分する。
  */
 export function buildPostText(args: PostTextArgs): string {
   const titleSource = (args.title || args.fallbackTitle || '').trim();
   const descriptionSource = args.description.trim();
+  const hashtagsLine = (args.hashtags ?? [])
+    .map((t) => t.trim())
+    .filter(Boolean)
+    .join(' ');
+
+  // 0. hashtag 行のグラフェム数 (\n\n 込み)
+  const hashtagsBudget = hashtagsLine
+    ? countGraphemes(hashtagsLine) + 2
+    : 0;
 
   // 1. タイトル
-  const titleMax = Math.min(MAX_TITLE_GRAPHEMES, MAX_GRAPHEMES);
+  const titleMax = Math.max(
+    0,
+    Math.min(MAX_TITLE_GRAPHEMES, MAX_GRAPHEMES - hashtagsBudget)
+  );
   const title = truncateGraphemes(titleSource, titleMax);
   const titleGraphemes = countGraphemes(title);
 
-  // 2. 要約
-  const descriptionBudget = MAX_GRAPHEMES - titleGraphemes - 2; // 2 = "\n\n"
+  // 2. 要約 (タイトルと hashtags を引いた残り予算)
+  const descriptionBudget =
+    MAX_GRAPHEMES - hashtagsBudget - titleGraphemes - 2; // -2 は description 前の \n\n
 
+  let body = title;
   if (descriptionSource && descriptionBudget >= MIN_DESCRIPTION_BUDGET) {
     const description = truncateGraphemes(descriptionSource, descriptionBudget);
-    return `${title}\n\n${description}`;
+    body = `${title}\n\n${description}`;
   }
-  return title;
+
+  // 3. ハッシュタグ行を末尾に付加
+  return hashtagsLine ? `${body}\n\n${hashtagsLine}` : body;
 }
 
 export function truncateGraphemes(input: string, max: number): string {

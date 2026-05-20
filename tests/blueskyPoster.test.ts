@@ -12,7 +12,7 @@ function countGraphemes(s: string): number {
 }
 
 describe('buildPostText', () => {
-  it('タイトル + 要約の 2 段構成 (trailer 無し)', () => {
+  it('タイトル + 要約の 2 段構成 (hashtag なし)', () => {
     const text = buildPostText({
       title: 'OpenSSL に深刻な RCE 脆弱性',
       description: '本日公開されたパッチで対処可能。影響範囲は ...',
@@ -21,8 +21,52 @@ describe('buildPostText', () => {
     expect(text).toContain('OpenSSL に深刻な RCE 脆弱性');
     expect(text).toContain('本日公開されたパッチで対処可能');
     expect(text.split('\n\n')).toHaveLength(2);
+    expect(text).not.toContain('#');
     // HN bot のような 💬 trailer は無いはず
     expect(text).not.toContain('💬');
+  });
+
+  it('hashtags があると 3 段構成になる', () => {
+    const text = buildPostText({
+      title: 'OpenSSL の脆弱性',
+      description: 'CVE-2024-1 が発見されました。',
+      hashtags: ['#CVE', '#脆弱性', '#セキュリティ'],
+      fallbackTitle: '',
+    });
+    const parts = text.split('\n\n');
+    expect(parts).toHaveLength(3);
+    expect(parts[2]).toBe('#CVE #脆弱性 #セキュリティ');
+  });
+
+  it('hashtags + description 無しなら 2 段 (タイトル + tags)', () => {
+    const text = buildPostText({
+      title: 'タイトルだけ',
+      description: '',
+      hashtags: ['#セキュリティ'],
+      fallbackTitle: '',
+    });
+    expect(text).toBe('タイトルだけ\n\n#セキュリティ');
+  });
+
+  it('hashtags が空配列なら従来通り (hashtag 行なし)', () => {
+    const text = buildPostText({
+      title: 'タイトル',
+      description: '本文',
+      hashtags: [],
+      fallbackTitle: '',
+    });
+    expect(text).toBe('タイトル\n\n本文');
+  });
+
+  it('hashtags 分を考慮して description を切り詰める', () => {
+    const text = buildPostText({
+      title: 'あ'.repeat(80),
+      description: 'い'.repeat(500),
+      hashtags: ['#ランサムウェア', '#セキュリティ'],
+      fallbackTitle: '',
+    });
+    expect(countGraphemes(text)).toBeLessThanOrEqual(300);
+    expect(text).toContain('#ランサムウェア #セキュリティ');
   });
 
   it('description が空ならタイトルだけ', () => {

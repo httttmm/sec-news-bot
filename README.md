@@ -148,22 +148,17 @@ Bluesky は本文 300 グラフェム制限。`Intl.Segmenter` でグラフェ�
 
 GitHub Actions の cron は高負荷時に遅延・スキップする仕様。これを緩和するため、毎時 **`:05` / `:25` / `:45` の 3 タイミング** で起動 + `concurrency` 制御で多重実行を防止。結果として「平常時は毎時 1 件、GitHub が混雑した時間帯は次の枠で追いつく」挙動になる。
 
-### 🧪 単体テスト（113 ケース）
+### 🧪 単体テスト戦略
 
-外部 API は **インターフェース注入で差し替え可能** な設計にして、すべての主要モジュールに単体テストを用意:
+**Vitest** で各モジュールに単体テストを用意。テスト容易性を担保するため、
 
-| モジュール | テスト件数 | 主な内容 |
-|---|---|---|
-| `config` | 13 | env 変数のパース・バリデーション |
-| `rssFetcher` | 6 | マルチソース合流・並べ替え・1 ソース落ち時の挙動 |
-| `keywordFilter` | 7 | 英日キーワード照合 |
-| `hashtagger` | 11 | 優先度・上限・フォールバック・誤検知防止 |
-| `languageDetect` | 5 | CJK 比率による日英判定 |
-| `translator` | 5 | Anthropic SDK モック・JSON パース |
-| `blueskyPoster` | 9 | 投稿テキスト構築・グラフェム切り詰め |
-| `postedUrlsStore` | 8 | 永続化・上限ローテーション・既存ファイル対応 |
-| `ogpFetcher` | 23 | OGP 抽出・charset 検出・本文抽出 |
-| `safeHttp` | 26 | プライベート IP 判定・URL 検証 |
+- **外部依存 (HTTP / RSS / Bluesky / Anthropic SDK) はすべてインターフェース注入で差し替え可能** な設計
+  - 例: `createOgpFetcher({ http: mockedAxios })`、`createTranslator({ client: mockedAnthropic })`
+- 実 API を叩かずにすべてユニットテストで完結
+- 文字コード処理（Shift_JIS / EUC-JP）は実バイト列をテスト内で組み立てて検証
+- SSRF 対策は IPv4 / IPv6 / IPv4-mapped IPv6 / loopback / ULA / link-local の各レンジを網羅
+
+`npm test` で全モジュールのテストが数秒で完走する。CI（GitHub Actions）に組み込めば、PR ごとにテスト結果を gate にできる。
 
 ---
 

@@ -44,11 +44,6 @@ jobs:
         with:
           fetch-depth: 1
           persist-credentials: true
-          # branch protection (Ruleset) を bypass するため、デフォルトの
-          # GITHUB_TOKEN ではなく admin の PAT で push する。
-          # PAT は repository admin の身分で動くので Ruleset の
-          # "Repository admin" bypass にマッチして PR 要求をスキップできる。
-          token: ${{ secrets.BOT_PUSH_TOKEN }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4

@@ -8,36 +8,31 @@ GitHub Actions の cron で JST 9〜23 時の毎時 1 件ずつ投稿します�
 
 ---
 
-## システム構成図
+## システム構成
 
 ```mermaid
-flowchart LR
-    subgraph trigger["⏰ Trigger"]
-        cron["GitHub Actions Cron<br/>JST 9-23 時 / 毎時 :05 :25 :45"]
-    end
+sequenceDiagram
+    autonumber
+    participant Cron as GitHub Actions<br/>(cron)
+    participant Bot as sec-news-bot
+    participant Feeds as RSS Sources
+    participant Claude as Anthropic Claude
+    participant Bsky as Bluesky
+    participant Store as posted_urls.json
 
-    subgraph runner["🤖 GitHub Actions Runner (ubuntu-latest, Node.js 20)"]
-        bot["sec-news-bot<br/>(TypeScript)"]
-        store[("data/posted_urls.json<br/>Git で永続化")]
-        bot <--> store
+    Cron->>Bot: 毎時 :05 / :25 / :45 起動
+    par 並列フェッチ
+        Bot->>Feeds: BleepingComputer
+        Bot->>Feeds: The Hacker News
+        Bot->>Feeds: ScanNetSecurity
     end
-
-    subgraph external["🌐 外部 API / RSS"]
-        rss1["BleepingComputer<br/>RSS"]
-        rss2["The Hacker News<br/>RSS"]
-        rss3["ScanNetSecurity<br/>RSS"]
-        anthropic["Anthropic API<br/>Claude Haiku 4.5"]
-        bluesky["Bluesky API<br/>(AT Protocol)"]
-    end
-
-    cron --> bot
-    rss1 --> bot
-    rss2 --> bot
-    rss3 --> bot
-    bot -->|英語記事を日本語訳| anthropic
-    anthropic --> bot
-    bot -->|リンクカード投稿| bluesky
-    bot -->|posted_urls.json を commit| github["GitHub Repo<br/>(main branch)"]
+    Feeds-->>Bot: 記事一覧 (~100 件)
+    Bot->>Bot: keyword filter / 重複排除 / 日付ソート
+    Bot->>Store: 投稿済みかチェック
+    Bot->>Claude: 英→日 翻訳 / 要約
+    Claude-->>Bot: JP title + description
+    Bot->>Bsky: リンクカード投稿
+    Bot->>Store: URL を追加 (Git commit & push)
 ```
 
 **ホスティング**: すべて GitHub Actions の `ubuntu-latest` ランナー上で実行。サーバー常設は不要で、cron 実行のたびに 1〜2 分立ち上がって終了する **ステートレス設計**。状態は `posted_urls.json` として Git で永続化する。

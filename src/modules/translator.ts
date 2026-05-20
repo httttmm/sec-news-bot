@@ -63,8 +63,10 @@ export function createTranslator(options: TranslatorOptions): Translator {
     new Anthropic({
       apiKey: options.apiKey,
       timeout: timeoutMs,
-      // 529 / 429 / 5xx を SDK が自動リトライ。デフォルト 2 → 5 に増やす
-      maxRetries: 5,
+      // 529 / 429 / 5xx を SDK が自動リトライ。デフォルト 2 → 8 に増やす
+      // (指数バックオフで ~60s 程度)。それでも失敗した記事は index.ts で
+      // スキップされ、posted_urls には登録されないので次の run で再挑戦される。
+      maxRetries: 8,
     });
 
   return {

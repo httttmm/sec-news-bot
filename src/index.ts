@@ -136,6 +136,9 @@ async function main(): Promise<void> {
       }
 
       // b. 翻訳 / 要約 (言語に応じて切替)
+      //   翻訳に失敗した場合は英語のまま投稿はしない。
+      //   posted_urls にも登録しないので、次の run で API 復帰後に
+      //   再挑戦される。
       let translated: TranslatedContent;
       try {
         translated = await translator.translate({
@@ -149,15 +152,16 @@ async function main(): Promise<void> {
           ja_title: translated.title,
         });
       } catch (err) {
-        logger.warn('translation_failed', {
+        logger.warn('translation_failed_skipping_article', {
           url: article.url,
           error: errorMessage(err),
         });
-        // 失敗時は元のタイトル + 元の description で投稿
-        translated = {
-          title: article.title,
-          description: ogp.description,
-        };
+        summary.failed++;
+        // for ループの次のイテレーションへ。投稿はしない、posted_urls にも登録しない。
+        if (i < candidates.length - 1 && config.postIntervalMs > 0) {
+          await sleep(config.postIntervalMs);
+        }
+        continue;
       }
 
       // c. 画像取得 (失敗してもテキストのみで投稿)

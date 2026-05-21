@@ -7,11 +7,11 @@ describe('pickHashtags', () => {
     expect(tags).toContain('#ランサムウェア');
   });
 
-  it('CVE ID と「脆弱性」両方マッチした場合、優先度順に並ぶ', () => {
+  it('CVE ID と「脆弱性」両方マッチした場合、優先度順に並び 3 件に padded される', () => {
     const tags = pickHashtags(
       'CVE-2024-12345: Apache HTTP Server に深刻な脆弱性'
     );
-    expect(tags).toEqual(['#CVE', '#脆弱性']);
+    expect(tags).toEqual(['#CVE', '#脆弱性', '#情報セキュリティ']);
   });
 
   it('複数の高優先トピックがあっても最大 3 件まで', () => {
@@ -35,12 +35,31 @@ describe('pickHashtags', () => {
     expect(tags).toContain('#サプライチェーン攻撃');
   });
 
-  it('何もマッチしなければ #セキュリティ がフォールバック', () => {
+  it('何もマッチしなければ #情報セキュリティ にフォールバック (1 件)', () => {
     const tags = pickHashtags('全く関係ない話題のニュース');
-    expect(tags).toEqual(['#セキュリティ']);
+    expect(tags).toEqual(['#情報セキュリティ']);
   });
 
-  it('maxCount = 1 で 1 件だけ返る', () => {
+  it('1 件しかマッチしないと #情報セキュリティ で padding して 2 件になる', () => {
+    const tags = pickHashtags('医療機関がランサムウェア被害');
+    expect(tags).toEqual(['#ランサムウェア', '#情報セキュリティ']);
+  });
+
+  it('2 件マッチでも #情報セキュリティ で padding して 3 件になる', () => {
+    // ランサムウェア + 情報漏洩 = 2 件 → +#情報セキュリティ で 3 件
+    const tags = pickHashtags('ランサムウェア攻撃で顧客情報が漏洩');
+    expect(tags).toEqual(['#ランサムウェア', '#情報漏洩', '#情報セキュリティ']);
+  });
+
+  it('3 件マッチした場合は padding しない', () => {
+    const tags = pickHashtags(
+      'CVE-2024-1: ransomware zero-day in npm supply chain'
+    );
+    expect(tags).toHaveLength(3);
+    expect(tags).not.toContain('#情報セキュリティ');
+  });
+
+  it('maxCount = 1 で 1 件だけ返る (padding も適用されない)', () => {
     const tags = pickHashtags(
       'CVE-2024-1: ransomware exploiting zero-day',
       1

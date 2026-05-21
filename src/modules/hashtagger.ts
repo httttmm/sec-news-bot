@@ -4,7 +4,8 @@
  *
  * - 同じタグは重複しない
  * - 高優先度のルールから順にマッチを試す
- * - 何もマッチしなければフォールバックタグを 1 つ返す
+ * - 指定件数に満たなければ #情報セキュリティ で 1 件だけ補完する
+ *   (それでも 3 件に届かない場合は届く分だけ)
  */
 
 interface HashtagRule {
@@ -17,8 +18,8 @@ interface HashtagRule {
 /** デフォルト最大ハッシュタグ数 */
 export const DEFAULT_MAX_HASHTAGS = 3;
 
-/** 何もマッチしない記事に付与するフォールバックタグ */
-const FALLBACK_TAG = 'セキュリティ';
+/** 件数が満たないときに padding として追加する汎用タグ */
+const DEFAULT_TAG = '情報セキュリティ';
 
 /**
  * ハッシュタグ判定ルール (優先度順)。
@@ -88,9 +89,10 @@ export function pickHashtags(
     }
   }
 
-  // 何もマッチしなかった場合のみフォールバック
-  if (tags.length === 0) {
-    tags.push(FALLBACK_TAG);
+  // maxCount に満たない場合は #情報セキュリティ で補完 (1 件のみ)。
+  // 結果として 0→1 / 1→2 / 2→3 / 3→3 となり、最大件数を超えない。
+  if (tags.length < maxCount && !seen.has(DEFAULT_TAG)) {
+    tags.push(DEFAULT_TAG);
   }
 
   return tags.map((t) => `#${t}`);

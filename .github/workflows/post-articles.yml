@@ -69,12 +69,25 @@ jobs:
 
       - name: Commit posted_urls.json if changed
         run: |
-          if [[ -n "$(git status --porcelain data/posted_urls.json)" ]]; then
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add data/posted_urls.json
-            git commit -m "chore(bot): update posted_urls.json [skip ci]"
-            git push
-          else
+          if [[ -z "$(git status --porcelain data/posted_urls.json)" ]]; then
             echo "No changes to posted_urls.json"
+            exit 0
           fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/posted_urls.json
+          git commit -m "chore(bot): update posted_urls.json [skip ci]"
+
+          # push をリトライ。race condition (他 run が先に push) と
+          # 一時的な認証/ネットワーク失敗の両方に対応。
+          for i in 1 2 3; do
+            if git push; then
+              echo "push succeeded on attempt $i"
+              exit 0
+            fi
+            echo "push attempt $i failed, pulling --rebase and retrying..."
+            git pull --rebase origin main || true
+            sleep $((i * 5))
+          done
+          echo "push failed after 3 attempts" >&2
+          exit 1

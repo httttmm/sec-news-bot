@@ -16,7 +16,7 @@ on:
       max_posts:
         description: "1 回の最大投稿件数"
         required: false
-        default: "1"
+        default: "2"
       disable_filter:
         description: "キーワードフィルタを無効化 (true)"
         required: false
@@ -62,7 +62,7 @@ jobs:
           BLUESKY_HANDLE: ${{ secrets.BLUESKY_HANDLE }}
           BLUESKY_APP_PASSWORD: ${{ secrets.BLUESKY_APP_PASSWORD }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          MAX_POSTS_PER_RUN: ${{ github.event.inputs.max_posts || '1' }}
+          MAX_POSTS_PER_RUN: ${{ github.event.inputs.max_posts || '2' }}
           DISABLE_KEYWORD_FILTER: ${{ github.event.inputs.disable_filter }}
           DEBUG: ${{ github.event.inputs.debug }}
         run: npm start

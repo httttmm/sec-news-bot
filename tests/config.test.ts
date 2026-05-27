@@ -20,11 +20,17 @@ describe('loadConfig', () => {
 
   it('デフォルトのフィードリストが適用される', () => {
     const c = loadConfig({ ...VALID });
-    expect(c.feedSources.length).toBeGreaterThanOrEqual(3);
+    expect(c.feedSources.length).toBeGreaterThanOrEqual(5);
     expect(c.feedSources.map((s) => s.name)).toEqual(
-      expect.arrayContaining(['BleepingComputer', 'The Hacker News'])
+      expect.arrayContaining([
+        'BleepingComputer',
+        'The Hacker News',
+        'ScanNetSecurity',
+        'Krebs on Security',
+        'JPCERT/CC',
+      ])
     );
-    expect(c.maxPostsPerRun).toBe(1);
+    expect(c.maxPostsPerRun).toBe(2);
     expect(c.disableKeywordFilter).toBe(false);
   });
 
@@ -93,6 +99,12 @@ describe('parseFeedUrls', () => {
     expect(
       parseFeedUrls('https://feeds.feedburner.com/TheHackersNews')[0]?.name
     ).toBe('The Hacker News');
+    expect(
+      parseFeedUrls('https://krebsonsecurity.com/feed/')[0]?.name
+    ).toBe('Krebs on Security');
+    expect(
+      parseFeedUrls('https://www.jpcert.or.jp/rss/jpcert.rdf')[0]?.name
+    ).toBe('JPCERT/CC');
   });
 
   it('未知ホストは hostname をそのまま使う', () => {

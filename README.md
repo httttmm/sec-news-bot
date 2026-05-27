@@ -4,7 +4,7 @@
 
 セキュリティ関連ニュースを国内外の RSS から集め、英語記事は Claude (Anthropic) で日本語に翻訳して Bluesky に投稿する Bot です。
 
-GitHub Actions の cron で JST 9〜23 時の毎時 1 件ずつ投稿します。
+GitHub Actions の cron で JST 9〜23 時の毎時 2 件ずつ投稿します。
 
 ---
 
@@ -34,7 +34,9 @@ GitHub Actions の cron で JST 9〜23 時の毎時 1 件ずつ投稿します�
 |---|---|---|---|
 | BleepingComputer | bleepingcomputer.com | 英 | ランサムウェア・漏洩・侵害の報告ニュース |
 | The Hacker News | thehackernews.com | 英 | CVE・サプライチェーン攻撃の解説 |
+| Krebs on Security | krebsonsecurity.com | 英 | 業界権威・深掘り調査記事 |
 | ScanNetSecurity | scan.netsecurity.ne.jp | 日 | 国内インシデント |
+| JPCERT/CC | jpcert.or.jp | 日 | 国内 CERT 公式の警報・注意喚起 |
 
 追加したいソースがあれば `SEC_FEED_URLS` をカンマ区切りで指定して上書きできます。
 
@@ -152,8 +154,8 @@ npm run dev              # 動作確認 (実投稿あり・Claude API 課金あ�
 | `BLUESKY_APP_PASSWORD` | ✅ | — | Bluesky アプリパスワード |
 | `ANTHROPIC_API_KEY` | ✅ | — | Anthropic API キー |
 | `TRANSLATION_MODEL` | — | `claude-haiku-4-5-20251001` | 使用 Claude モデル |
-| `SEC_FEED_URLS` | — | (デフォルト 3 ソース) | カンマ区切りで上書き可 |
-| `MAX_POSTS_PER_RUN` | — | `1` | 1 実行あたり最大投稿件数 |
+| `SEC_FEED_URLS` | — | (デフォルト 5 ソース) | カンマ区切りで上書き可 |
+| `MAX_POSTS_PER_RUN` | — | `2` | 1 実行あたり最大投稿件数 |
 | `DISABLE_KEYWORD_FILTER` | — | `false` | `true` でキーワードフィルタを無効化 |
 | `POSTED_URLS_FILE` | — | `data/posted_urls.json` | 投稿済み URL 保存先 |
 | `MAX_STORED_URLS` | — | `1000` | 投稿済み URL の保持上限 (超えると古いものからバッチ削除) |

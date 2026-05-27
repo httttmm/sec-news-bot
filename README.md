@@ -155,7 +155,7 @@ npm run dev              # 動作確認 (実投稿あり・Claude API 課金あ�
 | `ANTHROPIC_API_KEY` | ✅ | — | Anthropic API キー |
 | `TRANSLATION_MODEL` | — | `claude-haiku-4-5-20251001` | 使用 Claude モデル |
 | `SEC_FEED_URLS` | — | (デフォルト 5 ソース) | カンマ区切りで上書き可 |
-| `MAX_POSTS_PER_RUN` | — | `2` | 1 実行あたり最大投稿件数 |
+| `MAX_POSTS_PER_RUN` | — | `1` | 1 実行あたり最大投稿件数 |
 | `DISABLE_KEYWORD_FILTER` | — | `false` | `true` でキーワードフィルタを無効化 |
 | `POSTED_URLS_FILE` | — | `data/posted_urls.json` | 投稿済み URL 保存先 |
 | `MAX_STORED_URLS` | — | `1000` | 投稿済み URL の保持上限 (超えると古いものからバッチ削除) |

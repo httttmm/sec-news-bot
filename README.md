@@ -214,16 +214,25 @@ npm run typecheck
 
 ## 工夫した点
 
+### コスト・運用
 - インフラコスト 0 円運用（GitHub Actions + Bluesky 無料 + Claude Haiku 月 $0.05 程度）
+- GitHub Actions の schedule cron は遅延/スキップしやすいため、外部 cron (cron-job.org) から `workflow_dispatch` API でトリガーして信頼性を確保。多重実行は `concurrency` で抑制
+
+### 永続化・重複排除
 - 投稿済み URL を Git で永続化することで DB を立てずに重複投稿防止
-- `posted_urls.json` の上限到達時はバッチ削減（1000 → 900）で書き込み頻度を抑制
 - URL を `utm_*` クエリやフラグメント除去で正規化してから比較
+- `posted_urls.json` の上限到達時はバッチ削減（1000 → 900）で書き込み頻度を抑制
+
+### 堅牢性・エラー耐性
 - SSRF 対策として `dns.lookup` を hook、プライベート IP・loopback・link-local への接続を拒否
 - DoS 対策として axios の `maxContentLength` で HTML 2MB / 画像 1MB に制限
+- マルチソース RSS を `Promise.allSettled` で並列取得し、1 ソース落ちても全体は継続
+- 翻訳失敗時は英語のまま投稿せず、posted_urls に登録もしないので次の run で API 復帰後に再挑戦
+
+### テキスト処理・コンテンツ生成
 - 国内ニュースサイトの Shift_JIS / EUC-JP を自動判定して TextDecoder でデコード
 - Bluesky の 300 グラフェム制限内で title / 要約 / ハッシュタグの予算を動的配分
-- 翻訳失敗時は英語のまま投稿せず、posted_urls に登録もしないので次の run で API 復帰後に再挑戦
-- マルチソース RSS を `Promise.allSettled` で並列取得し、1 ソース落ちても全体は継続
 - 記事内容にマッチしたハッシュタグを優先度順に最大 3 つ動的選定
-- GitHub Actions の schedule cron は遅延/スキップしやすいため、外部 cron (cron-job.org) から `workflow_dispatch` API でトリガーして信頼性を確保。多重実行は `concurrency` で抑制
+
+### テスタビリティ
 - 外部依存をインターフェース注入で差し替え可能にし、実 API を叩かずユニットテスト完結

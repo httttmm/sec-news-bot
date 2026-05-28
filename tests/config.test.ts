@@ -30,7 +30,7 @@ describe('loadConfig', () => {
         'JPCERT/CC',
       ])
     );
-    expect(c.maxPostsPerRun).toBe(2);
+    expect(c.maxPostsPerRun).toBe(1);
     expect(c.disableKeywordFilter).toBe(false);
   });
 

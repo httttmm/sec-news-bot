@@ -8,7 +8,7 @@ const DEFAULT_FEED_URLS = [
   'https://www.jpcert.or.jp/rss/jpcert.rdf',
 ];
 const DEFAULT_TRANSLATION_MODEL = 'claude-haiku-4-5-20251001';
-const DEFAULT_MAX_POSTS_PER_RUN = 2;
+const DEFAULT_MAX_POSTS_PER_RUN = 1;
 const DEFAULT_POSTED_URLS_FILE = 'data/posted_urls.json';
 const DEFAULT_MAX_STORED_URLS = 1000;
 const DEFAULT_POST_INTERVAL_MS = 3000;

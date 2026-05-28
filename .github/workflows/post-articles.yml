@@ -1,22 +1,15 @@
 name: Post security news to Bluesky
 
 on:
-  # JST 9〜23 時の毎時実行 = UTC 0〜14 時。
-  # GitHub Actions の cron は高負荷時に遅延/スキップする仕様 (公式ドキュメント)
-  # https://docs.github.com/en/actions/writing-workflows/choosing-when-your-workflow-runs/events-that-trigger-workflows#schedule
-  # 信頼性を上げるため毎時 :05 / :25 / :45 の 3 タイミングを設定。
-  # concurrency 設定により同時実行はされず、queue されて順次実行される。
-  # 結果として「毎時 1 件、ただし遅延した時間帯は 2〜3 件まとめて投稿される可能性あり」。
-  schedule:
-    - cron: "5 0-14 * * *"
-    - cron: "25 0-14 * * *"
-    - cron: "45 0-14 * * *"
+  # 外部 cron (cron-job.org) から workflow_dispatch 経由でトリガー。
+  # GitHub Actions の schedule は高負荷時に遅延/スキップする仕様で信頼性が低いため
+  # 使用せず、外部からの定刻トリガーで JST 9〜23 時の毎時起動する。
   workflow_dispatch:
     inputs:
       max_posts:
         description: "1 回の最大投稿件数"
         required: false
-        default: "2"
+        default: "1"
       disable_filter:
         description: "キーワードフィルタを無効化 (true)"
         required: false
@@ -62,7 +55,7 @@ jobs:
           BLUESKY_HANDLE: ${{ secrets.BLUESKY_HANDLE }}
           BLUESKY_APP_PASSWORD: ${{ secrets.BLUESKY_APP_PASSWORD }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          MAX_POSTS_PER_RUN: ${{ github.event.inputs.max_posts || '2' }}
+          MAX_POSTS_PER_RUN: ${{ github.event.inputs.max_posts || '1' }}
           DISABLE_KEYWORD_FILTER: ${{ github.event.inputs.disable_filter }}
           DEBUG: ${{ github.event.inputs.debug }}
         run: npm start

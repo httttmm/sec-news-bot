@@ -77,6 +77,46 @@ describe('matchesSecurityTopic', () => {
       matchesSecurityTopic(makeArticle({ title: 'RANSOMWARE attack reported' }))
     ).toBe(true);
   });
+
+  it('DDoS 攻撃をマッチ', () => {
+    expect(
+      matchesSecurityTopic(
+        makeArticle({ title: 'Massive DDoS attack hits CDN provider' })
+      )
+    ).toBe(true);
+  });
+
+  it('botnet をマッチ', () => {
+    expect(
+      matchesSecurityTopic(
+        makeArticle({ title: 'New IoT botnet recruits routers' })
+      )
+    ).toBe(true);
+  });
+
+  it('日本語 ボットネット をマッチ', () => {
+    expect(
+      matchesSecurityTopic(
+        makeArticle({ title: '大規模ボットネットが摘発される' })
+      )
+    ).toBe(true);
+  });
+
+  it('日本語 改ざん をマッチ', () => {
+    expect(
+      matchesSecurityTopic(
+        makeArticle({ title: '政府機関の公式サイトが改ざん被害' })
+      )
+    ).toBe(true);
+  });
+
+  it('日本語 個人情報 をマッチ', () => {
+    expect(
+      matchesSecurityTopic(
+        makeArticle({ title: '通販サイトから顧客の個人情報が漏えい' })
+      )
+    ).toBe(true);
+  });
 });
 
 describe('filterBySecurityTopic', () => {

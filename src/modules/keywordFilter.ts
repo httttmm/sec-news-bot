@@ -39,8 +39,11 @@ export const SECURITY_KEYWORDS: readonly (string | RegExp)[] = [
   '漏えい',
   '流出',
   '情報流出',
+  '個人情報',
   '不正アクセス',
   '侵入',
+  '改ざん',
+  '踏み台',
   'unauthorized access',
   'data exposed',
 
@@ -75,13 +78,24 @@ export const SECURITY_KEYWORDS: readonly (string | RegExp)[] = [
   'cyberattack',
   'cyber attack',
   'サイバー攻撃',
+  'cybercrime',
+  'サイバー犯罪',
   'targeted attack',
   '標的型',
-  'standard型攻撃',
+  '標的型攻撃',
   'apt',
   'threat actor',
   '攻撃グループ',
   'state-sponsored',
+  'ハッカー',
+  'なりすまし',
+
+  // ─── DDoS / ボットネット
+  'ddos',
+  'denial of service',
+  'denial-of-service',
+  'botnet',
+  'ボットネット',
 
   // ─── 認証・アクセス
   'credentials stolen',

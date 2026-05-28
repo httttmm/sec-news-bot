@@ -4,7 +4,7 @@
 
 セキュリティ関連ニュースを国内外の RSS から集め、英語記事は Claude (Anthropic) で日本語に翻訳して Bluesky に投稿する Bot です。
 
-GitHub Actions の cron で JST 9〜23 時の毎時 2 件ずつ投稿します。
+外部 cron (cron-job.org) から GitHub Actions の `workflow_dispatch` をトリガーして、JST 9〜23 時の毎時 1 件ずつ投稿します。
 
 ---
 
@@ -65,7 +65,7 @@ sec-news-bot/
 │   └── updateProfile.ts          # Bot bio を更新 (ワンショット)
 ├── data/posted_urls.json         # 投稿済み URL (Git 管理)
 └── .github/workflows/
-    └── post-articles.yml         # JST 9〜23時に毎時実行
+    └── post-articles.yml         # workflow_dispatch で起動 (外部 cron からトリガー)
 ```
 
 ## 必要環境
@@ -79,20 +79,24 @@ sec-news-bot/
 ```mermaid
 sequenceDiagram
     autonumber
-    participant Cron as GitHub Actions<br/>(cron)
+    participant Cron as cron-job.org<br/>(外部 cron)
+    participant GHA as GitHub Actions<br/>(workflow_dispatch)
     participant Bot as sec-news-bot
     participant Feeds as RSS Sources
     participant Claude as Anthropic Claude
     participant Bsky as Bluesky
     participant Store as posted_urls.json
 
-    Cron->>Bot: 毎時 :05 / :25 / :45 起動
+    Cron->>GHA: 毎時 :00 trigger (workflow_dispatch API)
+    GHA->>Bot: ジョブ起動
     par 並列フェッチ
         Bot->>Feeds: BleepingComputer
         Bot->>Feeds: The Hacker News
+        Bot->>Feeds: Krebs on Security
         Bot->>Feeds: ScanNetSecurity
+        Bot->>Feeds: JPCERT/CC
     end
-    Feeds-->>Bot: 記事一覧 (~100 件)
+    Feeds-->>Bot: 記事一覧 (~150 件)
     Bot->>Bot: keyword filter / 重複排除 / 日付ソート
     Bot->>Store: 投稿済みかチェック
     Bot->>Claude: 英→日 翻訳 / 要約
@@ -101,7 +105,7 @@ sequenceDiagram
     Bot->>Store: URL を追加 (Git commit & push)
 ```
 
-ホスティングは GitHub Actions の `ubuntu-latest` ランナー上で完結します。サーバー常設は不要で、cron 実行のたびに 1〜2 分立ち上がって終了するステートレス設計。状態は `posted_urls.json` として Git で永続化します。
+ホスティングは GitHub Actions の `ubuntu-latest` ランナー上で完結します。サーバー常設は不要で、トリガーされるたびに 1〜2 分立ち上がって終了するステートレス設計。状態は `posted_urls.json` として Git で永続化します。
 
 ## 技術スタック
 
@@ -219,5 +223,5 @@ npm run typecheck
 - 翻訳失敗時は英語のまま投稿せず、posted_urls に登録もしないので次の run で API 復帰後に再挑戦
 - マルチソース RSS を `Promise.allSettled` で並列取得し、1 ソース落ちても全体は継続
 - 記事内容にマッチしたハッシュタグを優先度順に最大 3 つ動的選定
-- GitHub Actions cron の不発対策として毎時 :05 / :25 / :45 の 3 タイミングで起動 + `concurrency` で多重実行抑止
+- GitHub Actions の schedule cron は遅延/スキップしやすいため、外部 cron (cron-job.org) から `workflow_dispatch` API でトリガーして信頼性を確保。多重実行は `concurrency` で抑制
 - 外部依存をインターフェース注入で差し替え可能にし、実 API を叩かずユニットテスト完結

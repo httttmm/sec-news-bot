@@ -117,6 +117,29 @@ describe('matchesSecurityTopic', () => {
       )
     ).toBe(true);
   });
+
+  it('sextortion 系のニュースはマッチさせない (extortion キーワードは削除済み)', () => {
+    // 'extortion' 単独キーワードがあると "sextortionist" 等の派生語まで
+    // 通過してしまうため、回帰防止のためのテスト。
+    expect(
+      matchesSecurityTopic(
+        makeArticle({
+          title:
+            'Sextortionist sentenced to 33 years for targeting 145 children',
+        })
+      )
+    ).toBe(false);
+  });
+
+  it('double extortion (ランサムウェアの二重恐喝) は引き続きマッチ', () => {
+    expect(
+      matchesSecurityTopic(
+        makeArticle({
+          title: 'New ransomware group adopts double extortion tactics',
+        })
+      )
+    ).toBe(true);
+  });
 });
 
 describe('filterBySecurityTopic', () => {

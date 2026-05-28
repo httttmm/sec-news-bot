@@ -20,11 +20,14 @@ export const SECURITY_KEYWORDS: readonly (string | RegExp)[] = [
   '0day',
   'ゼロデイ',
 
-  // ─── ランサムウェア・恐喝
+  // ─── ランサムウェア
+  // 注: 'extortion' 単独は sextortion / cyber extortion 等の派生語まで
+  // マッチしてしまい false positive (児童被害ニュース等) を招くため削除。
+  // ランサムウェア由来の脅迫は 'ransomware' / 'double extortion' / '身代金'
+  // でカバーする。
   'ransomware',
   'ランサムウェア',
   '身代金',
-  'extortion',
   'double extortion',
 
   // ─── 漏洩・侵入

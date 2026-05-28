@@ -1,5 +1,6 @@
 # sec-news-bot
 
+[![CI](https://github.com/httttmm/sec-news-bot/actions/workflows/ci.yml/badge.svg)](https://github.com/httttmm/sec-news-bot/actions/workflows/ci.yml)
 [![Post security news to Bluesky](https://github.com/httttmm/sec-news-bot/actions/workflows/post-articles.yml/badge.svg)](https://github.com/httttmm/sec-news-bot/actions/workflows/post-articles.yml)
 
 セキュリティ関連ニュースを国内外の RSS から集め、英語記事は Claude (Anthropic) で日本語に翻訳して Bluesky に投稿する Bot です。

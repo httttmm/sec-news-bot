@@ -35,6 +35,13 @@ export const HASHTAG_RULES: readonly HashtagRule[] = [
     tag: 'サプライチェーン攻撃',
   },
 
+  // ─── DDoS / ボットネット
+  { pattern: /botnet|ボットネット/i, tag: 'ボットネット' },
+  {
+    pattern: /ddos|denial[\s-]?of[\s-]?service/i,
+    tag: 'DDoS',
+  },
+
   // ─── 漏洩・侵害
   // セキュリティ文脈で「流出」が出るのはほぼ情報流出系なので単独でも拾う
   {

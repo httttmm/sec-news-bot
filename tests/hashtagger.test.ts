@@ -91,6 +91,24 @@ describe('pickHashtags', () => {
     expect(pickHashtags('フィッシング詐欺の手口')).toContain('#フィッシング');
   });
 
+  it('botnet 記事には #ボットネット が付く', () => {
+    expect(
+      pickHashtags('Glassworm botnet disrupted after C2 takedown')
+    ).toContain('#ボットネット');
+    expect(pickHashtags('大規模ボットネットが摘発される')).toContain(
+      '#ボットネット'
+    );
+  });
+
+  it('DDoS 記事には #DDoS が付く', () => {
+    expect(pickHashtags('Massive DDoS attack hits CDN provider')).toContain(
+      '#DDoS'
+    );
+    expect(
+      pickHashtags('denial of service attack on banking sector')
+    ).toContain('#DDoS');
+  });
+
   it('同じタグは重複しない', () => {
     // "ransomware" と "ランサムウェア" 両方含むケース → 1 件のみ
     const tags = pickHashtags('ransomware attack: ランサムウェア が拡散');

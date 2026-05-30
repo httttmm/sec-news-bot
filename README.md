@@ -177,6 +177,7 @@ npm run dev              # 動作確認 (実投稿あり・Claude API 課金あ�
 - 漏洩 / 侵入 / 不正アクセス / 改ざん / 踏み台 / 個人情報
 - サプライチェーン攻撃 / 悪意のあるパッケージ
 - マルウェア / フィッシング
+- 認証・セッション関連 (credential theft / session・cookie 盗難 / MFA bypass)
 - DDoS / ボットネット
 - 標的型攻撃 / APT / ハッカー / なりすまし / サイバー犯罪
 - 各種攻撃手法 (RCE, XSS, SQL injection 等)

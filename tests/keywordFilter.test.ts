@@ -140,6 +140,33 @@ describe('matchesSecurityTopic', () => {
       )
     ).toBe(true);
   });
+
+  it('session cookie 盗難の記事をマッチ', () => {
+    expect(
+      matchesSecurityTopic(
+        makeArticle({
+          title:
+            'Google Chrome adds session cookie theft protection for all users',
+        })
+      )
+    ).toBe(true);
+  });
+
+  it('cookie theft (単独表現) をマッチ', () => {
+    expect(
+      matchesSecurityTopic(
+        makeArticle({ title: 'Malware steals browser cookies via cookie theft' })
+      )
+    ).toBe(true);
+  });
+
+  it('日本語 セッションハイジャック をマッチ', () => {
+    expect(
+      matchesSecurityTopic(
+        makeArticle({ title: 'セッションハイジャック攻撃の手口を解説' })
+      )
+    ).toBe(true);
+  });
 });
 
 describe('filterBySecurityTopic', () => {

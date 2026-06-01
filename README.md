@@ -35,8 +35,10 @@
 |---|---|---|---|
 | BleepingComputer | bleepingcomputer.com | 英 | ランサムウェア・漏洩・侵害の報告ニュース |
 | The Hacker News | thehackernews.com | 英 | CVE・サプライチェーン攻撃の解説 |
+| Dark Reading | darkreading.com | 英 | 業界誌、企業セキュリティ動向 |
 | Krebs on Security | krebsonsecurity.com | 英 | 業界権威・深掘り調査記事 |
 | ScanNetSecurity | scan.netsecurity.ne.jp | 日 | 国内インシデント |
+| Security NEXT | security-next.com | 日 | 国内 daily ニュース、企業インシデント |
 | JPCERT/CC | jpcert.or.jp | 日 | 国内 CERT 公式の警報・注意喚起 |
 
 追加したいソースがあれば `SEC_FEED_URLS` をカンマ区切りで指定して上書きできます。
@@ -93,11 +95,13 @@ sequenceDiagram
     par 並列フェッチ
         Bot->>Feeds: BleepingComputer
         Bot->>Feeds: The Hacker News
+        Bot->>Feeds: Dark Reading
         Bot->>Feeds: Krebs on Security
         Bot->>Feeds: ScanNetSecurity
+        Bot->>Feeds: Security NEXT
         Bot->>Feeds: JPCERT/CC
     end
-    Feeds-->>Bot: 記事一覧 (~150 件)
+    Feeds-->>Bot: 記事一覧 (~200 件)
     Bot->>Bot: keyword filter / 重複排除 / 日付ソート
     Bot->>Store: 投稿済みかチェック
     Bot->>Claude: 英→日 翻訳 / 要約
@@ -159,7 +163,7 @@ npm run dev              # 動作確認 (実投稿あり・Claude API 課金あ�
 | `BLUESKY_APP_PASSWORD` | ✅ | — | Bluesky アプリパスワード |
 | `ANTHROPIC_API_KEY` | ✅ | — | Anthropic API キー |
 | `TRANSLATION_MODEL` | — | `claude-haiku-4-5-20251001` | 使用 Claude モデル |
-| `SEC_FEED_URLS` | — | (デフォルト 5 ソース) | カンマ区切りで上書き可 |
+| `SEC_FEED_URLS` | — | (デフォルト 7 ソース) | カンマ区切りで上書き可 |
 | `MAX_POSTS_PER_RUN` | — | `1` | 1 実行あたり最大投稿件数 |
 | `DISABLE_KEYWORD_FILTER` | — | `false` | `true` でキーワードフィルタを無効化 |
 | `POSTED_URLS_FILE` | — | `data/posted_urls.json` | 投稿済み URL 保存先 |

@@ -3,8 +3,10 @@ import type { Config, FeedSource } from '../types/index.js';
 const DEFAULT_FEED_URLS = [
   'https://www.bleepingcomputer.com/feed/',
   'https://feeds.feedburner.com/TheHackersNews',
-  'https://scan.netsecurity.ne.jp/rss/index.rdf',
+  'https://www.darkreading.com/rss.xml',
   'https://krebsonsecurity.com/feed/',
+  'https://scan.netsecurity.ne.jp/rss/index.rdf',
+  'https://www.security-next.com/feed',
   'https://www.jpcert.or.jp/rss/jpcert.rdf',
 ];
 const DEFAULT_TRANSLATION_MODEL = 'claude-haiku-4-5-20251001';
@@ -105,6 +107,8 @@ function guessSourceName(hostname: string): string {
     'github.com': 'GitHub Advisory',
     'www.jpcert.or.jp': 'JPCERT/CC',
     'jpcert.or.jp': 'JPCERT/CC',
+    'www.darkreading.com': 'Dark Reading',
+    'darkreading.com': 'Dark Reading',
   };
   if (KNOWN[hostname]) return KNOWN[hostname];
   if (KNOWN[stripped]) return KNOWN[stripped];

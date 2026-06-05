@@ -9,6 +9,8 @@ import path from 'node:path';
  * - すでに process.env に値がある場合は **上書きしない**
  * - `KEY=VALUE` 形式のみ対応。`export` プレフィックスは無視可
  * - シングル/ダブルクォートで囲われていればクォートを外す
+ * - ダブルクォート内では `\n` / `\r` / `\t` / `\"` / `\\` をエスケープ解釈
+ *   (シングルクォートは literal なので解釈しない)
  */
 export function loadDotenvIfPresent(file = '.env'): void {
   try {
@@ -25,12 +27,14 @@ export function loadDotenvIfPresent(file = '.env'): void {
       const key = lineNoExport.slice(0, eq).trim();
       let value = lineNoExport.slice(eq + 1).trim();
       // 行末にインラインコメントがあれば落とす (クォート外のみ)
-      if (!isQuoted(value)) {
+      if (!isDoubleQuoted(value) && !isSingleQuoted(value)) {
         const hashIdx = value.indexOf(' #');
         if (hashIdx >= 0) value = value.slice(0, hashIdx).trim();
       }
       // クォートが付いていれば外す
-      if (isQuoted(value)) {
+      if (isDoubleQuoted(value)) {
+        value = unescapeDoubleQuoted(value.slice(1, -1));
+      } else if (isSingleQuoted(value)) {
         value = value.slice(1, -1);
       }
       if (process.env[key] === undefined) {
@@ -42,10 +46,33 @@ export function loadDotenvIfPresent(file = '.env'): void {
   }
 }
 
-function isQuoted(s: string): boolean {
-  return (
-    s.length >= 2 &&
-    ((s.startsWith('"') && s.endsWith('"')) ||
-      (s.startsWith("'") && s.endsWith("'")))
-  );
+function isDoubleQuoted(s: string): boolean {
+  return s.length >= 2 && s.startsWith('"') && s.endsWith('"');
+}
+
+function isSingleQuoted(s: string): boolean {
+  return s.length >= 2 && s.startsWith("'") && s.endsWith("'");
+}
+
+/**
+ * ダブルクォートで囲まれた文字列内のエスケープシーケンスを解釈する。
+ * dotenv の de facto 仕様に合わせ、`\n` / `\r` / `\t` / `\"` / `\\` を扱う。
+ */
+function unescapeDoubleQuoted(s: string): string {
+  return s.replace(/\\([nrt"\\])/g, (_m, ch: string) => {
+    switch (ch) {
+      case 'n':
+        return '\n';
+      case 'r':
+        return '\r';
+      case 't':
+        return '\t';
+      case '"':
+        return '"';
+      case '\\':
+        return '\\';
+      default:
+        return ch;
+    }
+  });
 }

@@ -2,6 +2,8 @@
   "name": "sec-news-bot",
   "version": "0.1.0",
   "private": true,
+  "license": "MIT",
+  "author": "httttmm",
   "description": "セキュリティニュース (脆弱性 / ランサムウェア / 漏洩 / サプライチェーン攻撃 等) を複数 RSS から集めて Bluesky に投稿する Bot。英語記事は Claude で日本語訳。",
   "type": "module",
   "engines": {

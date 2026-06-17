@@ -2,6 +2,7 @@
 
 [![CI](https://github.com/httttmm/sec-news-bot/actions/workflows/ci.yml/badge.svg)](https://github.com/httttmm/sec-news-bot/actions/workflows/ci.yml)
 [![Post security news to Bluesky](https://github.com/httttmm/sec-news-bot/actions/workflows/post-articles.yml/badge.svg)](https://github.com/httttmm/sec-news-bot/actions/workflows/post-articles.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 セキュリティ関連ニュースを国内外の RSS から集め、英語記事は Claude (Anthropic) で日本語に翻訳して Bluesky に投稿する Bot です。
 
@@ -242,3 +243,9 @@ npm run typecheck
 
 ### テスタビリティ
 - 外部依存をインターフェース注入で差し替え可能にし、実 API を叩かずユニットテスト完結
+
+---
+
+## ライセンス
+
+MIT License。詳細は [LICENSE](./LICENSE) を参照。

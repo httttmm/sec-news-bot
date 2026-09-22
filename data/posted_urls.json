@@ -1,6 +1,7 @@
 {
   "version": 1,
   "urls": [
+    "https://www.bleepingcomputer.com/news/security/cisa-alerts-of-active-exploitation-of-three-linux-kernel-flaws/",
     "https://www.bleepingcomputer.com/news/security/bigcommerce-alerts-merchants-of-data-breach-linked-to-ribon-apps/",
     "https://www.bleepingcomputer.com/news/microsoft/microsoft-reminds-admins-to-migrate-entra-id-users-to-passkeys/",
     "https://thehackernews.com/2026/09/critical-unbound-dnssec-validator-flaw.html",

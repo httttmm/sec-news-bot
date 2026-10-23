@@ -1,6 +1,7 @@
 {
   "version": 1,
   "urls": [
+    "https://www.bleepingcomputer.com/news/security/hpe-patches-eight-max-severity-rce-and-auth-bypass-aos-flaws/",
     "https://thehackernews.com/2026/10/urgent-php-warns-of-another-unpatched.html",
     "https://thehackernews.com/2026/10/critical-flaw-in-pythons-popular-pillow.html",
     "https://www.security-next.com/191838",

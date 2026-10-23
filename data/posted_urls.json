@@ -1,6 +1,7 @@
 {
   "version": 1,
   "urls": [
+    "https://thehackernews.com/2026/10/critical-flaw-in-pythons-popular-pillow.html",
     "https://www.security-next.com/191838",
     "https://thehackernews.com/2026/10/php2shell-exploit-attempts-hit-millions.html",
     "https://thehackernews.com/2026/10/researchers-demonstrate-node2shell-rce.html",

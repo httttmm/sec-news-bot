@@ -1,6 +1,7 @@
 {
   "version": 1,
   "urls": [
+    "https://www.bleepingcomputer.com/news/security/blackx-uefi-bootkit-exploits-baton-drop-flaw-to-bypass-secure-boot/",
     "https://thehackernews.com/2026/10/hackers-breach-enterprise-firewalls-and.html",
     "https://thehackernews.com/2026/10/leaked-litellm-master-key-let-attackers.html",
     "https://thehackernews.com/2026/10/brotli-decoder-flaw-behind-nodejs-rce.html",
